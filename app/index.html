@@ -17,7 +17,10 @@
   <!--build:css css/styles.min.css-->
   <link rel="stylesheet" href="css/styles.css">
   <!--endbuild-->
-
+  <script
+  src="https://code.jquery.com/jquery-3.2.1.min.js"
+  integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+  crossorigin="anonymous"></script>
 
 
 </head>
@@ -32,6 +35,19 @@
   </header>
 
   <div class="form-wrapper">
+
+    <script id="example-template" type="text/x-handlebars-template">
+
+  <!-- people is looked up on the global context, the one we pass to the compiled template -->
+
+  {{#each streamers}}
+
+    <!-- Here the context is each individual person. So we can access its properties directly: -->
+    <p>{{streamer.name}}</p>
+
+  {{/each}}
+
+</script>
 
   </div>
 

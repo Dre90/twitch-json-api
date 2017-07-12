@@ -18,3 +18,28 @@ function makeURL(type, name) {
 
   return 'https://api.twitch.tv/kraken/' + type + '/' + name + client_id;
 }
+
+
+function getStreams() {
+    var result="";
+    $.ajax({
+      url: makeURL("streams", channels[i]),
+      async: false,
+      success:function(data) {
+         result = data;
+      }
+   });
+   return result;
+}
+
+function getChannels() {
+    var result="";
+    $.ajax({
+      url: makeURL("channels", channels[i]),
+      async: false,
+      success:function(data) {
+         result = data;
+      }
+   });
+   return result;
+}

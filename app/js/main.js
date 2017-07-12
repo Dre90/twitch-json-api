@@ -1,110 +1,114 @@
+$(function() {
 var streamer = {name: "", game: "", status: ""};
 // var channels = ["blizzheroes","lost_in_house","ESL_SC2", "OgamingSC2", "cretetion", "freecodecamp", "storbeck", "habathcx", "RobotCaleb", "noobs2ninjas"];
 
 // var channels = ["followgrubby", "anderzel", "freecodecamp","brunofin"];
-var channels = ["anderzel", "freecodecamp"];
+var channels = ["monstercat", "freecodecamp"];
 var i;
 // var channels = ["brunofin"];
 
 getChannelInfo();
 
-function getChannelInfo() {
+function getStreams() {
+    var result="";
+    $.ajax({
+      url: makeURL("streams", channels[i]),
+      async: false,
+      success:function(data) {
+         result = data;
+      }
+   });
+   return result;
+}
 
+function getChannels() {
+    var result="";
+    $.ajax({
+      url: makeURL("channels", channels[i]),
+      async: false,
+      success:function(data) {
+         result = data;
+      }
+   });
+   return result;
+}
+
+function getChannelInfo() {
+  var streamers = [];
   for (i = 0; i < channels.length; i++) {
 
-    axios.get(makeURL("streams", channels[i]))
-      .then(function (response) {
-        var game, status, name;
-        if (response.data.stream === null) {
-          game = "Offline";
-          status = "offline";
-        } else if (response.data.stream === undefined) {
-          game = "Account Closed";
-          status = "offline";
-        } else {
-          if (response.data.stream.game === null) {
-            game = "no game chosen";
-          } else {
-            game = response.data.stream.game + ":";
-          }
-          status = "online";
-        }
+    Streams = getStreams();
+    Channels = getChannels();
 
-console.log("channels[i]", channels[i]);
+    var game, status, name;
+    if (Streams.stream === null) {
+      game = "Offline";
+      status = "offline";
+    } else if (Streams.stream === undefined) {
+      game = "Account Closed";
+      status = "offline";
+    } else {
+      if (Streams.stream.game === null) {
+        game = "no game chosen";
+      } else {
+        game = Streams.stream.game + ":";
+      }
+      status = "online";
+    }
 
-        // name = channels[i];
+    // Logo
+    if (Channels.logo !== null) {
+      logo = Channels.logo;
 
-        if (status === "online") {
-          // Name
-          name = response.data.stream.channel.display_name;
+    } else {
+      logo =  "https://dummyimage.com/50x50/ecf0e7/5c5457.jpg&text=0x3F";
+    }
 
-        }
+    // Name
+    if (Channels.display_name !== null) {
+       name = Channels.display_name;
+    } else {
+      name = channels[i];
+    }
 
+    // Description
+    if(status === "online") {
+      description = Channels.status;
+    } else {
+      description = "";
+    }
 
+    // url
+    url = Channels.url;
 
-
-        streamer = {
+    streamer = {
           name: name,
           game: game,
-          status: status
+          status: status,
+          logo: logo,
+          description: description,
+          url: url
         };
 
-        // console.log("name ", streamer.name);
-        // console.log("game ", streamer.game);
-
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-
-
-
-      axios.get(makeURL("channels", channels[i]))
-        .then(function (response) {
-
-          var name;
-            // Logo
-            if (response.data.logo !== null) {
-              logo = response.data.logo;
-
-            } else {
-              logo =  "https://dummyimage.com/50x50/ecf0e7/5c5457.jpg&text=0x3F";
-            }
-
-            // Name
-            if (response.data.display_name !== null) {
-               name = response.data.display_name;
-            } else {
-              name = channels[i];
-            }
-
-            // Description
-            if(status === "online") {
-              description = response.data.status;
-            } else {
-              description = "";
-            }
-
-            // url
-            url = response.data.url;
-
-
-
-
-
-          streamer = {
-            name: name
-          };
-
-          // console.log("name ", streamer.name);
-          // console.log("game ", streamer.game);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-
-
-        // console.log("name ", streamer.name);
-        // console.log("game ", streamer.game);
+    streamers.push(streamer);
   } // end for loop
+  // console.log("name ", streamers);
+
+  // Grab the template script
+var theTemplateScript = $("#example-template").html();
+
+// Compile the template
+var theTemplate = Handlebars.compile(theTemplateScript);
+
+var content = {};
+
+content += streamers;
+
+// Pass our data to the template
+  var theCompiledHtml = theTemplate(content);
+  console.log(content);
+
+  // Add the compiled html to the page
+  $('.content-wrapper').html(theCompiledHtml);
 } // end function
+});
